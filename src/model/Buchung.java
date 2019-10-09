@@ -1,70 +1,69 @@
 package model;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 import java.time.LocalDate;
 
 public class Buchung {
 
-    private IntegerProperty stundenZahl = new SimpleIntegerProperty();
+    private DoubleProperty stundenZahl = new SimpleDoubleProperty();
+    private DoubleProperty stundenLohn = new SimpleDoubleProperty();
+    private DoubleProperty gesamtLohnTag = new SimpleDoubleProperty();
+    private ObjectProperty<LocalDate> localDate = new SimpleObjectProperty();
 
-    public Buchung(int gesamtLohnTag, java.time.LocalDate dateValue, String stundenValue, String stundenAnzahl) {
+    public Buchung(Double gesamtLohnTag, java.time.LocalDate dateValue, Double stundenValue, Double stundenAnzahl) {
+        stundenZahl.set(stundenAnzahl);
+        stundenLohn.set(stundenValue);
+        this.gesamtLohnTag.set(gesamtLohnTag);
+        localDate.set(dateValue);
+        
     }
 
-    public int getStundenAnzahl(){
+    public Double getStundenAnzahl() {
         return stundenZahl.get();
     }
 
-    public void setStundenZahl(int stunden){
+    public void setStundenZahl(Double stunden) {
         stundenZahl.set(stunden);
     }
 
-    public IntegerProperty stundenZahlProperty(){
+    public DoubleProperty stundenZahlProperty() {
         return stundenZahl;
     }
 
-    private IntegerProperty stundenLohn = new SimpleIntegerProperty();
-
-    public int getStundenLohn(){
+    public Double getStundenLohn() {
         return stundenLohn.get();
     }
 
-    public void setStundenLohn(int stundenLohn){
+    public void setStundenLohn(Double stundenLohn) {
         this.stundenLohn.set(stundenLohn);
     }
 
-    public IntegerProperty stundenLohnProperty(){
+    public DoubleProperty stundenLohnProperty() {
         return stundenLohn;
     }
 
-    private IntegerProperty gesamtLohnTag = new SimpleIntegerProperty();
-
-    public int getGesamtLohnTag(){
+    public Double getGesamtLohnTag() {
         return gesamtLohnTag.get();
     }
 
-    public void setGesamtLohnTag(int gesamtLohnTag){
+    public void setGesamtLohnTag(Double gesamtLohnTag) {
         this.gesamtLohnTag.set(gesamtLohnTag);
     }
 
-    public IntegerProperty gesamtLohnTagProperty(){
+    public DoubleProperty gesamtLohnTagProperty() {
         return gesamtLohnTag;
     }
 
-    private ObjectProperty<LocalDate> LocalDate = new SimpleObjectProperty();
-
-    public LocalDate getLocalDate(){
-        return LocalDate.get();
+    public LocalDate getLocalDate() {
+        return localDate.get();
     }
 
-    public void setLocalDate(LocalDate LocalDate){
-        this.LocalDate.set(LocalDate);
+    public void setLocalDate(LocalDate LocalDate) {
+        this.localDate.set(LocalDate);
     }
 
-    public ObjectProperty<LocalDate> localDateObjectProperty(){
-        return LocalDate;
+    public ObjectProperty<LocalDate> localDateObjectProperty() {
+        return localDate;
     }
 }

@@ -13,117 +13,53 @@ import model.Abrechnung;
 import model.Buchung;
 
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParsePosition;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class AbrechnungsController {
 
     Abrechnung abrechnung;
-
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
-
     @FXML // URL location of the FXML file that was given to the FXMLLoader
     private URL location;
-
     @FXML // fx:id="buchungsTabelle"
     private TableView<Buchung> buchungsTabelle; // Value injected by FXMLLoader
-
     @FXML // fx:id="datumColumn"
     private TableColumn<Buchung, LocalDate> datumColumn; // Value injected by FXMLLoader
-
     @FXML // fx:id="stundenColumn"
-    private TableColumn<Buchung, Integer> stundenColumn; // Value injected by FXMLLoader
-
+    private TableColumn<Buchung, Double> stundenColumn; // Value injected by FXMLLoader
     @FXML // fx:id="stundenLohnColumn"
-    private TableColumn<Buchung, Integer> stundenLohnColumn; // Value injected by FXMLLoader
-
+    private TableColumn<Buchung, Double> stundenLohnColumn; // Value injected by FXMLLoader
     @FXML // fx:id="lohnColumn"
-    private TableColumn<Buchung, Integer> lohnColumn; // Value injected by FXMLLoader
-
+    private TableColumn<Buchung, Double> lohnColumn; // Value injected by FXMLLoader
     @FXML // fx:id="summeLabel"
     private Label summeLabel; // Value injected by FXMLLoader
-
     @FXML // fx:id="dateSelectFeld"
     private DatePicker dateSelectFeld; // Value injected by FXMLLoader
-
     @FXML // fx:id="stundenAnzahlFeld"
     private TextField stundenAnzahlFeld; // Value injected by FXMLLoader
-
     @FXML // fx:id="stundenLohnFeld"
     private TextField stundenLohnFeld; // Value injected by FXMLLoader
-
     @FXML // fx:id="speichernButton"
     private Button speichernButton; // Value injected by FXMLLoader
-
     @FXML // fx:id="aendernButton"
     private Button aendernButton; // Value injected by FXMLLoader
-
     @FXML // fx:id="loeschenButton"
     private Button loeschenButton; // Value injected by FXMLLoader
 
     @FXML
-    void deleteSelectedEntry(MouseEvent event) {
-        abrechnung.deleteSelectedEntry(buchungsTabelle.getSelectionModel().getSelectedItem());
-    }
-
-    @FXML
-    void loadEntry(MouseEvent event) {
-        if (isSelected()) {
-            Buchung selected = buchungsTabelle.getSelectionModel().getSelectedItem();
-            dateSelectFeld.setValue(selected.getLocalDate());
-            stundenAnzahlFeld.setText(Integer.toString(selected.getStundenAnzahl()));
-            stundenLohnFeld.setText(Integer.toString(selected.getStundenLohn()));
-        }
-    }
-
-    @FXML
-    void safeEntry(MouseEvent event) {
-        ObservableList<Buchung> buchungsList = buchungsTabelle.getItems();
-        if (fieldsAreEmpty()) {
-            abrechnung.setBuchungsList(buchungsList);
-            abrechnung.safeBooking(getGesamtLohnTag(), dateSelectFeld.getValue(), stundenLohnFeld.getText(), stundenAnzahlFeld.getText());
-        }
-    }
-
-    private boolean fieldsAreEmpty() {
-        return dateSelectFeld.getValue() != null && !stundenLohnFeld.getText().isEmpty() && !stundenAnzahlFeld.getText().isEmpty();
-    }
-
-    private boolean isSelected() {
-        return buchungsTabelle.getSelectionModel().getSelectedItem() != null;
-    }
-
-    private int getGesamtLohnTag() {
-        return Integer.parseInt(stundenLohnFeld.getText()) * Integer.parseInt(stundenAnzahlFeld.getText());
-    }
-
-    private void createBookingTable() {
-
-        datumColumn.setCellValueFactory(cellDataFeatures -> cellDataFeatures.getValue().localDateObjectProperty());
-
-        stundenColumn.setCellValueFactory(cellDataFeatures -> cellDataFeatures.getValue().stundenZahlProperty().asObject());
-
-        stundenLohnColumn.setCellValueFactory(cellDataFeatures -> cellDataFeatures.getValue().stundenLohnProperty().asObject());
-
-        lohnColumn.setCellValueFactory(cellDataFeatures -> cellDataFeatures.getValue().gesamtLohnTagProperty().asObject());
-
-    }
-
-    @FXML
-        // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         abrechnung = new Abrechnung();
         createBookingTable();
 
-        buchungsTabelle.getItems().addListener((ListChangeListener) change -> {
-            int summe = 0;
-            for (Buchung item : buchungsTabelle.getItems()) {
-                summe = summe + item.getGesamtLohnTag();
-            }
-            summeLabel.setText(String.valueOf(summe));
-        });
+        addTableItemChangeListener();
 
+        addEntryFormatChangeListener();
 
         assert buchungsTabelle != null : "fx:id=\"buchungsTabelle\" was not injected: check your FXML file 'AbrechnungsView.fxml'.";
         assert datumColumn != null : "fx:id=\"datumColumn\" was not injected: check your FXML file 'AbrechnungsView.fxml'.";
@@ -140,5 +76,97 @@ public class AbrechnungsController {
 
     }
 
+    @FXML
+    void deleteSelectedEntry(MouseEvent event) {
+        abrechnung.deleteSelectedEntry(buchungsTabelle.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
+    void loadEntry(MouseEvent event) {
+        if (isSelected()) {
+            Buchung selected = buchungsTabelle.getSelectionModel().getSelectedItem();
+            dateSelectFeld.setValue(selected.getLocalDate());
+            stundenAnzahlFeld.setText(Double.toString(selected.getStundenAnzahl()));
+            stundenLohnFeld.setText(Double.toString(selected.getStundenLohn()));
+        }
+    }
+
+    @FXML
+    void safeEntry(MouseEvent event) {
+        ObservableList<Buchung> buchungsList = buchungsTabelle.getItems();
+        if (fieldsAreEmpty()) {
+            abrechnung.setBuchungsList(buchungsList);
+            abrechnung.safeBooking(getGesamtLohnTag(), dateSelectFeld.getValue(),
+                    Double.parseDouble(stundenLohnFeld.getText()), Double.parseDouble(stundenAnzahlFeld.getText()));
+        }
+    }
+
+    private Double getGesamtLohnTag() {
+        return Double.parseDouble(stundenLohnFeld.getText()) * Double.parseDouble(stundenAnzahlFeld.getText());
+    }
+
+    private void createBookingTable() {
+
+        datumColumn.setCellValueFactory(cellDataFeatures
+                -> cellDataFeatures.getValue().localDateObjectProperty());
+
+        stundenColumn.setCellValueFactory(cellDataFeatures
+                -> cellDataFeatures.getValue().stundenZahlProperty().asObject());
+
+        stundenLohnColumn.setCellValueFactory(cellDataFeatures
+                -> cellDataFeatures.getValue().stundenLohnProperty().asObject());
+
+        lohnColumn.setCellValueFactory(cellDataFeatures
+                -> cellDataFeatures.getValue().gesamtLohnTagProperty().asObject());
+
+    }
+
+
+    private void addEntryFormatChangeListener() {
+        DecimalFormat format = new DecimalFormat("#.0");
+        format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.UK));
+
+        setDecimalTextFormatter(format, stundenAnzahlFeld);
+
+        setDecimalTextFormatter(format, stundenLohnFeld);
+    }
+
+    private void setDecimalTextFormatter(DecimalFormat format, TextField stundenAnzahlFeld) {
+        stundenAnzahlFeld.setTextFormatter(new TextFormatter<>(c ->
+        {
+            if (c.getControlNewText().isEmpty()) {
+                return c;
+            }
+
+            ParsePosition parsePosition = new ParsePosition(0);
+            Object object = format.parse(c.getControlNewText(), parsePosition);
+
+            if (object == null || parsePosition.getIndex() < c.getControlNewText().length()) {
+                return null;
+            } else {
+                return c;
+            }
+        }));
+    }
+
+    private void addTableItemChangeListener() {
+        buchungsTabelle.getItems().addListener((ListChangeListener) change -> {
+            Double summe = 0.0;
+            for (Buchung item : buchungsTabelle.getItems()) {
+                summe = summe + item.getGesamtLohnTag();
+            }
+            summeLabel.setText(String.valueOf(summe));
+        });
+    }
+
+    private boolean fieldsAreEmpty() {
+        return dateSelectFeld.getValue() != null
+                && !stundenLohnFeld.getText().isEmpty()
+                && !stundenAnzahlFeld.getText().isEmpty();
+    }
+
+    private boolean isSelected() {
+        return buchungsTabelle.getSelectionModel().getSelectedItem() != null;
+    }
 
 }
