@@ -1,6 +1,9 @@
-package main.java.model;
+package model;
 
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.time.LocalDate;
 
@@ -16,7 +19,7 @@ public class Buchung {
         stundenLohn.set(stundenValue);
         this.gesamtLohnTag.set(gesamtLohnTag);
         localDate.set(dateValue);
-        
+
     }
 
     public Double getStundenAnzahl() {
