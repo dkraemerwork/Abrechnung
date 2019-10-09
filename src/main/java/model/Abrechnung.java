@@ -26,7 +26,7 @@ public class Abrechnung {
         buchungsList.remove(selectedItem);
     }
 
-    public void safeBooking(int gesamtLohnTag, LocalDate dateValue, String stundenValue, String stundenAnzahl) {
+    public void safeBooking(Double gesamtLohnTag, LocalDate dateValue, Double stundenValue, Double stundenAnzahl) {
         Buchung buchung = new Buchung(gesamtLohnTag, dateValue, stundenValue, stundenAnzahl);
 
         Buchung inUsage = hasUsage(buchung);
