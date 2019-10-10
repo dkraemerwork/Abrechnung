@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
@@ -11,7 +12,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AbrechnungsController">
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AbrechnungsController">
    <columnConstraints>
       <ColumnConstraints />
    </columnConstraints>
@@ -68,6 +69,7 @@
                   <Button fx:id="speichernButton" mnemonicParsing="false" onMouseClicked="#safeEntry" text="speichern" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                   <Button fx:id="aendernButton" mnemonicParsing="false" onMouseClicked="#loadEntry" text="ändern" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                   <Button fx:id="loeschenButton" mnemonicParsing="false" onMouseClicked="#deleteSelectedEntry" text="löschen" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
+                  <CheckBox mnemonicParsing="false" onAction="#enterQuickEdit" text="Quick edit" GridPane.halignment="CENTER" />
                </children>
             </GridPane>
          </children>

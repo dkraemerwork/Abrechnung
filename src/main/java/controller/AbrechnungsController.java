@@ -4,14 +4,15 @@
 
 package controller;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import model.Buchung;
 import model.Abrechnung;
-
+import model.Buchung;
 
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -46,6 +47,14 @@ public class AbrechnungsController {
     private TextField stundenAnzahlFeld; // Value injected by FXMLLoader
     @FXML // fx:id="stundenLohnFeld"
     private TextField stundenLohnFeld; // Value injected by FXMLLoader
+
+    private ChangeListener changeListener = ((obs, oldValue, newValue) -> {
+        Buchung buchung = (Buchung) obs.getValue();
+        if (null != buchung){
+                setAllTextFields(buchung);
+            }
+    });
+
     @FXML // fx:id="speichernButton"
     private Button speichernButton; // Value injected by FXMLLoader
     @FXML // fx:id="aendernButton"
@@ -85,11 +94,15 @@ public class AbrechnungsController {
     @FXML
     void loadEntry(MouseEvent event) {
         if (isSelected()) {
-            Buchung selected = buchungsTabelle.getSelectionModel().getSelectedItem();
-            dateSelectFeld.setValue(selected.getLocalDate());
-            stundenAnzahlFeld.setText(Double.toString(selected.getStundenAnzahl()));
-            stundenLohnFeld.setText(Double.toString(selected.getStundenLohn()));
+            setAllTextFields(buchungsTabelle.getSelectionModel().getSelectedItem());
         }
+    }
+
+    private void setAllTextFields(Buchung selectedItem) {
+        Buchung selected = buchungsTabelle.getSelectionModel().getSelectedItem();
+        dateSelectFeld.setValue(selected.getLocalDate());
+        stundenAnzahlFeld.setText(Double.toString(selected.getStundenAnzahl()));
+        stundenLohnFeld.setText(Double.toString(selected.getStundenLohn()));
     }
 
     @FXML
@@ -122,7 +135,6 @@ public class AbrechnungsController {
 
     }
 
-
     private void addEntryFormatChangeListener() {
         DecimalFormat format = new DecimalFormat("#.0");
         format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.UK));
@@ -140,9 +152,9 @@ public class AbrechnungsController {
             }
 
             ParsePosition parsePosition = new ParsePosition(0);
-            Object object = format.parse(c.getControlNewText(), parsePosition);
+            Number number = format.parse(c.getControlNewText(), parsePosition);
 
-            if (object == null || parsePosition.getIndex() < c.getControlNewText().length()) {
+            if (number == null || parsePosition.getIndex() < c.getControlNewText().length()) {
                 return null;
             } else {
                 return c;
@@ -168,6 +180,19 @@ public class AbrechnungsController {
 
     private boolean isSelected() {
         return buchungsTabelle.getSelectionModel().getSelectedItem() != null;
+    }
+
+    public void enterQuickEdit(ActionEvent event) {
+        CheckBox radioButton = (CheckBox) event.getSource();
+        if (radioButton.isSelected()) {
+            addQuickTableSelectListener();
+        } else buchungsTabelle.getSelectionModel().selectedItemProperty().removeListener(changeListener);
+    }
+
+    private void addQuickTableSelectListener() {
+
+        buchungsTabelle.getSelectionModel().selectedItemProperty().addListener(changeListener);
+
     }
 
 }
